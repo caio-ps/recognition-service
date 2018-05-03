@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.1.RELEASE")
+        classpath('org.springframework.boot:spring-boot-gradle-plugin:2.0.1.RELEASE')
     }
 }
 
@@ -12,6 +12,12 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
+
+dependencyManagement {
+    imports {
+        mavenBom 'software.amazon.awssdk:bom:2.0.0-preview-9'
+    }
+}
 
 bootJar {
     baseName = 'recognition-service'
@@ -26,6 +32,8 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-    compile("org.springframework.boot:spring-boot-starter-web")
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('software.amazon.awssdk:s3')
+    compile('software.amazon.awssdk:rekognition')
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }
