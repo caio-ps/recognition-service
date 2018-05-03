@@ -1,11 +1,14 @@
 package hello;
 
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import software.amazon.awssdk.core.auth.ProfileCredentialsProvider;
 import software.amazon.awssdk.core.regions.Region;
 import software.amazon.awssdk.services.rekognition.RekognitionClient;
 import software.amazon.awssdk.services.rekognition.model.DetectLabelsRequest;
@@ -17,13 +20,10 @@ import software.amazon.awssdk.services.rekognition.model.S3Object;
 public class RecognitionController {
 
 	@RequestMapping(path = "/detectLabels", method = RequestMethod.GET)
-	public DetectLabelsResponse test() {
+	public List<RecognitionLabel> test(@RequestParam(name = "imageName", defaultValue = "erro.png") String imageName) {
 
 		RekognitionClient rekognition = RekognitionClient.builder()
 				.region(Region.US_WEST_2)
-				.credentialsProvider(ProfileCredentialsProvider.builder()
-						.profileName("adminuser")
-						.build())
 				.build();
 		
 		DetectLabelsResponse detectLabelsResponse = 
@@ -32,12 +32,15 @@ public class RecognitionController {
 							Image.builder().s3Object(
 									S3Object.builder()
 									.bucket("caio-ps-recognition-service")
-									.name("test1.png")
+									.name(imageName)
 									.build())
 							.build())
 					.build());
+		
+		List<RecognitionLabel> labels = detectLabelsResponse.labels().stream()
+				.map((label) -> new RecognitionLabel(label.name(), label.confidence())).collect(Collectors.toList());
 
-		return detectLabelsResponse;
+		return labels;
 		
 	}
 }
