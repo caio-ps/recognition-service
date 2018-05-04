@@ -15,9 +15,6 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 @RestController
 public class StorageController {
 
-	private static final String contentTypeTemplate = "image/%s";
-	private static final String keyTemplate = "%s.%s";
-	
 	@RequestMapping(path = "/uploadImage", method = RequestMethod.POST)
 	public Object test(@org.springframework.web.bind.annotation.RequestBody ImageUpload imageUpload) {
 
@@ -27,10 +24,10 @@ public class StorageController {
 		
 		s3.putObject(
 				PutObjectRequest.builder()
-					.bucket("caio-ps-recognition-service")
-					.contentType(String.format(contentTypeTemplate, imageUpload.getExtension()))
+					.bucket(Constants.S3_BUCKET.value())
+					.contentType(String.format(Constants.CONTENT_TYPE_TEMPLATE.value(), imageUpload.getExtension()))
 					.contentEncoding("base64")
-					.key(String.format(keyTemplate, imageUpload.getName(), imageUpload.getExtension()))
+					.key(String.format(Constants.KEY_TEMPLATE.value(), imageUpload.getName(), imageUpload.getExtension()))
 					.build()
 				, RequestBody.of(Base64.getDecoder().decode(imageUpload.getContent())));
 
